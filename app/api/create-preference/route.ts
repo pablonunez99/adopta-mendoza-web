@@ -18,9 +18,10 @@ export async function POST(req: Request) {
       body: {
         items: [
           {
+            id: 'donation',
             title: title,
             quantity: quantity,
-            unit_price: price,
+            unit_price: Number(price),
             currency_id: 'ARS',
           },
         ],

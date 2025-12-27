@@ -156,7 +156,7 @@ export default function DonatePage() {
               )}
               
               {!loading && preferenceId && (
-                <Wallet initialization={{ preferenceId: preferenceId }} customization={{ texts: { valueProp: 'smart_option' } }} />
+                <Wallet initialization={{ preferenceId: preferenceId }} />
               )}
 
               {!loading && !preferenceId && (
