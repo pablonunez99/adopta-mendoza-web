@@ -5,6 +5,7 @@ import Link from 'next/link';
 
 import ShareButtons from '@/components/ShareButtons';
 import FavoriteButton from '@/components/FavoriteButton';
+import PetImage from '@/components/PetImage';
 
 interface Mascota {
   id: string;
@@ -120,7 +121,7 @@ export default async function MascotaPage({ params }: { params: Promise<{ id: st
                   mascota.photos.length === 2 ? 'h-full' :
                   'md:col-span-2 md:row-span-2'
                 }`}>
-                  <img 
+                  <PetImage 
                     src={mascota.photos[0]} 
                     alt={`${mascota.name} principal`}
                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
@@ -130,7 +131,7 @@ export default async function MascotaPage({ params }: { params: Promise<{ id: st
                 {/* Resto de imágenes (hasta 4 más) */}
                 {mascota.photos.slice(1, 5).map((foto, index) => (
                    <div key={index} className="relative overflow-hidden hidden md:block">
-                     <img 
+                     <PetImage 
                        src={foto} 
                        alt={`${mascota.name} - foto ${index + 2}`} 
                        className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"

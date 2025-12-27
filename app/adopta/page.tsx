@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Plus } from 'lucide-react';
 import AdoptionFilters from '@/components/AdoptionFilters';
 import FavoriteButton from '@/components/FavoriteButton';
+import PetImage from '@/components/PetImage';
 
 // Definimos el tipo (Similar a tu modelo en Dart)
 type Animal = {
@@ -63,8 +64,6 @@ async function getAnimals(searchParams: { [key: string]: string | string[] | und
   }; 
 }
 
-// ... (helpers remain same)
-
 export default async function AdoptaPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
   const params = await searchParams;
   const { animals, count } = await getAnimals(params);
@@ -93,20 +92,16 @@ export default async function AdoptaPage({ searchParams }: { searchParams: Promi
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
               {animals.map((animal) => (
                 <Link href={`/mascotas/${animal.id}`} key={animal.id} >
-                  {/* ... (card content remains same) */}
-                                  <div className="bg-white dark:bg-[#1a1a1a] rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 group h-full flex flex-col">
-                                    <div className="relative h-64 w-full bg-gray-200 dark:bg-gray-800">
-                                      <div className="absolute top-2 right-2 z-10">
-                                        <FavoriteButton animalId={animal.id} />
-                                      </div>
-                                      {animal.photos && animal.photos.length > 0 ? (                        <img 
-                          src={animal.photos[0]} 
-                          alt={animal.name}
-                          className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
-                        />
-                      ) : (
-                        <div className="flex items-center justify-center h-full text-gray-400">Sin foto</div>
-                      )}
+                  <div className="bg-white dark:bg-[#1a1a1a] rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 group h-full flex flex-col">
+                    <div className="relative h-64 w-full bg-gray-200 dark:bg-gray-800">
+                      <div className="absolute top-2 right-2 z-10">
+                        <FavoriteButton animalId={animal.id} />
+                      </div>
+                      <PetImage 
+                        src={animal.photos?.[0]} 
+                        alt={animal.name}
+                        className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
+                      />
                       <div className="absolute bottom-2 left-2 bg-black/60 text-white text-xs px-2 py-1 rounded-md backdrop-blur-sm">
                         {animal.shelters?.name ? `📍 ${animal.shelters.name}` : '👤 Particular'}
                       </div>
@@ -173,4 +168,16 @@ export default async function AdoptaPage({ searchParams }: { searchParams: Promi
       </div>
     </main>
   );
+}
+
+function traducirTamano(size: string) {
+  if (size === 'small' || size?.includes('peque')) return 'Pequeño';
+  if (size === 'large' || size?.includes('grande')) return 'Grande';
+  return 'Mediano';
+}
+
+function traducirSexo(sex: string) {
+  if (sex === 'male') return 'Macho';
+  if (sex === 'female') return 'Hembra';
+  return 'Desconocido';
 }
