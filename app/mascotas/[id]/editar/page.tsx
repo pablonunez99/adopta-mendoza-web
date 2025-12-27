@@ -321,7 +321,7 @@ export default function EditPetPage({ params }: { params: Promise<{ id: string }
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Ubicación (Si deseas cambiarla)</label>
               <div className="h-64 md:h-80 w-full rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 relative">
                  <LocationPicker 
-                   apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''} 
+                   apiKey={process.env.GOOGLE_MAPS_API_KEY || ''} 
                    onLocationSelect={(lat, lng) => setLocation({ lat, lng })}
                  />
               </div>

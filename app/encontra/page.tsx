@@ -24,7 +24,7 @@ async function getLostPets() {
 
 export default async function EncontraPage() {
   const lostPets = await getLostPets();
-  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
+  const apiKey = process.env.GOOGLE_MAPS_API_KEY || '';
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
@@ -50,7 +50,7 @@ export default async function EncontraPage() {
             <AlertTriangle className="w-16 h-16 text-yellow-500 mb-4" />
             <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">Falta configuración</h2>
             <p className="text-gray-600 dark:text-gray-400 max-w-md">
-              Para ver el mapa, necesitas configurar la variable de entorno <code>NEXT_PUBLIC_GOOGLE_MAPS_API_KEY</code>.
+              Para ver el mapa, necesitas configurar la variable de entorno <code>GOOGLE_MAPS_API_KEY</code>.
             </p>
           </div>
         ) : (
