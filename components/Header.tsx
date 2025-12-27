@@ -59,6 +59,14 @@ export function Header() {
 
           {/* Actions */}
           <div className="flex items-center gap-4">
+            <Link 
+              href="/favoritos"
+              className="p-2 text-gray-600 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-500 transition-colors"
+              title="Mis Favoritos"
+            >
+              <Heart className="w-5 h-5" />
+            </Link>
+
             <ThemeToggle />
             
             {user ? (

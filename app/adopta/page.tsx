@@ -2,6 +2,7 @@ import { supabase } from '@/lib/supabaseClient';
 import Link from 'next/link';
 import { Plus } from 'lucide-react';
 import AdoptionFilters from '@/components/AdoptionFilters';
+import FavoriteButton from '@/components/FavoriteButton';
 
 // Definimos el tipo (Similar a tu modelo en Dart)
 type Animal = {
@@ -93,10 +94,12 @@ export default async function AdoptaPage({ searchParams }: { searchParams: Promi
               {animals.map((animal) => (
                 <Link href={`/mascotas/${animal.id}`} key={animal.id} >
                   {/* ... (card content remains same) */}
-                  <div className="bg-white dark:bg-[#1a1a1a] rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 group h-full flex flex-col">
-                    <div className="relative h-64 w-full bg-gray-200 dark:bg-gray-800">
-                      {animal.photos && animal.photos.length > 0 ? (
-                        <img 
+                                  <div className="bg-white dark:bg-[#1a1a1a] rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 group h-full flex flex-col">
+                                    <div className="relative h-64 w-full bg-gray-200 dark:bg-gray-800">
+                                      <div className="absolute top-2 right-2 z-10">
+                                        <FavoriteButton animalId={animal.id} />
+                                      </div>
+                                      {animal.photos && animal.photos.length > 0 ? (                        <img 
                           src={animal.photos[0]} 
                           alt={animal.name}
                           className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"

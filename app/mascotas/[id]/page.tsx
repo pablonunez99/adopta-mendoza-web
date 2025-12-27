@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 
 import ShareButtons from '@/components/ShareButtons';
+import FavoriteButton from '@/components/FavoriteButton';
 
 interface Mascota {
   id: string;
@@ -143,16 +144,26 @@ export default async function MascotaPage({ params }: { params: Promise<{ id: st
           {/* SECCIÓN 2: Información de la Mascota */}
           <div className="p-8 md:p-12">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-              <div>
-                <h1 className="text-4xl font-extrabold text-gray-900 dark:text-gray-100 mb-2">{mascota.name}</h1>
+              <div className="flex-1">
+                <div className="flex justify-between items-start">
+                  <h1 className="text-4xl font-extrabold text-gray-900 dark:text-gray-100 mb-2">{mascota.name}</h1>
+                  <div className="md:hidden">
+                    <FavoriteButton animalId={mascota.id} size="large" />
+                  </div>
+                </div>
                 <p className="text-xl text-gray-500 dark:text-gray-400 font-medium">{mascota.species} • {mascota.breed}</p>
               </div>
               
-              {mascota.status !== 'adoptable' && (
-                <span className="bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 px-4 py-2 rounded-full font-bold">
-                  {mascota.status === 'adopted' ? '¡Adoptado!' : 'Reservado'}
-                </span>
-              )}
+              <div className="flex items-center gap-4">
+                 <div className="hidden md:block">
+                   <FavoriteButton animalId={mascota.id} size="large" />
+                 </div>
+                 {mascota.status !== 'adoptable' && (
+                    <span className="bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 px-4 py-2 rounded-full font-bold">
+                      {mascota.status === 'adopted' ? '¡Adoptado!' : 'Reservado'}
+                    </span>
+                 )}
+              </div>
             </div>
 
             {/* Chips de Detalles */}

@@ -107,6 +107,7 @@ type LostPet = {
   photos: string[];
   description: string;
   species: string;
+  status: string;
 };
 
 interface LostPetsMapProps {
@@ -192,7 +193,9 @@ export default function LostPetsMap({ pets, apiKey }: LostPetsMapProps) {
             className="cursor-pointer transform -translate-x-1/2 -translate-y-full hover:scale-110 transition-transform duration-200 relative group"
           >
             {/* Pin Shape container */}
-            <div className="w-12 h-12 rounded-full border-4 border-white dark:border-gray-800 shadow-lg overflow-hidden bg-gray-200 relative z-10">
+            <div className={`w-12 h-12 rounded-full border-4 shadow-lg overflow-hidden bg-gray-200 relative z-10 ${
+              pet.status === 'found' ? 'border-blue-500' : 'border-[#fb3c46]'
+            }`}>
                {pet.photos && pet.photos[0] ? (
                  <img 
                    src={pet.photos[0]} 
@@ -200,13 +203,17 @@ export default function LostPetsMap({ pets, apiKey }: LostPetsMapProps) {
                    className="w-full h-full object-cover" 
                  />
                ) : (
-                 <div className="w-full h-full flex items-center justify-center bg-primary text-white">
+                 <div className={`w-full h-full flex items-center justify-center text-white ${
+                    pet.status === 'found' ? 'bg-blue-500' : 'bg-[#fb3c46]'
+                 }`}>
                    <Dog className="w-6 h-6" />
                  </div>
                )}
             </div>
             {/* Triangle/Pointer at bottom */}
-            <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1 w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[12px] border-t-white dark:border-t-gray-800"></div>
+            <div className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1 w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[12px] ${
+              pet.status === 'found' ? 'border-t-blue-500' : 'border-t-[#fb3c46]'
+            }`}></div>
           </div>
         </OverlayView>
       ))}

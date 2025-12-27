@@ -6,11 +6,11 @@ import Link from 'next/link';
 export const dynamic = 'force-dynamic';
 
 async function getLostPets() {
-  // Fetch animals with status 'lost' or similar. 
-  // We filter where lat/long are not null.
+  // Fetch animals with status 'lost' OR 'found' (sightings). 
   const { data, error } = await supabase
     .from('animals')
     .select('id, name, last_seen_lat, last_seen_long, photos, description, species, status')
+    .in('status', ['lost', 'found']) // Fetch both types
     .not('last_seen_lat', 'is', null)
     .not('last_seen_long', 'is', null);
 
@@ -38,8 +38,7 @@ export default async function EncontraPage() {
             Buscador de Mascotas
           </h1>
           <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-            Mapa en tiempo real de mascotas reportadas como perdidas. 
-            Ayúdanos a que vuelvan a casa.
+            Mapa en tiempo real de mascotas perdidas y avistamientos recientes.
           </p>
         </div>
       </section>
@@ -59,14 +58,22 @@ export default async function EncontraPage() {
         )}
       </section>
 
-      {/* Report Button / Floating Action */}
-      <div className="fixed bottom-8 right-8 z-20">
+      {/* Action Buttons */}
+      <div className="fixed bottom-8 right-8 z-20 flex flex-col gap-4 items-end">
+        <Link 
+          href="/encontra/avistamiento"
+          className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 font-bold py-3 px-6 rounded-full shadow-xl flex items-center gap-2 hover:scale-105 transition-transform"
+        >
+          <Search className="w-5 h-5 text-blue-500" />
+          Vi una mascota
+        </Link>
+        
         <Link 
           href="/encontra/reportar"
           className="bg-primary hover:bg-red-600 text-white font-bold py-4 px-6 rounded-full shadow-2xl flex items-center gap-2 hover:scale-105 transition-transform"
         >
           <AlertTriangle className="w-5 h-5" />
-          Reportar Mascota
+          Perdí mi mascota
         </Link>
       </div>
 
