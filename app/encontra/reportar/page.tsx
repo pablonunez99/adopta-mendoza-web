@@ -56,12 +56,7 @@ export default function ReportLostPetPage() {
           photos: [photoUrl],
           last_seen_lat: location.lat,
           last_seen_long: location.lng,
-          // We assume shelter_id is null for citizen reports, 
-          // or we might need a 'reporter_id' field if the schema supported it.
-          // Based on schema, there is no 'reporter_id' on animals table, only 'shelter_id'.
-          // This might be a schema limitation. 
-          // For now, we insert it. If RLS policies require a shelter_id, this might fail.
-          // Assuming public/citizens can insert 'lost' animals.
+          owner_id: user.id,
         },
       ]);
 

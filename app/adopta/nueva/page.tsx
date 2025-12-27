@@ -67,7 +67,7 @@ export default function AddPetPage() {
           medical_notes: medicalNotes,
           status: 'adoptable',
           photos: [photoUrl],
-          // shelter_id: we'd ideally fetch the user's shelter here
+          owner_id: user.id,
         },
       ]);
 

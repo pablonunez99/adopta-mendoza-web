@@ -63,12 +63,12 @@ export function Header() {
             
             {user ? (
               <div className="flex items-center gap-4">
-                 <div className="hidden md:flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+                 <Link href="/perfil" className="hidden md:flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary transition-colors">
                    <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center text-primary">
                      <UserIcon className="w-4 h-4" />
                    </div>
                    <span className="max-w-[100px] truncate">{user.email}</span>
-                 </div>
+                 </Link>
                  <button 
                    onClick={() => signOut()}
                    className="p-2 text-gray-500 hover:text-red-500 transition-colors"
@@ -113,12 +113,21 @@ export function Header() {
             ))}
             <hr className="border-gray-100 dark:border-gray-800" />
             {user ? (
-              <button 
-                onClick={() => { signOut(); setIsMenuOpen(false); }}
-                className="flex items-center gap-2 text-lg font-bold text-red-500"
-              >
-                <LogOut className="w-5 h-5" /> Cerrar Sesión
-              </button>
+              <>
+                <Link
+                  href="/perfil"
+                  className="flex items-center gap-2 text-lg font-bold text-gray-600 dark:text-gray-300 hover:text-primary"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <UserIcon className="w-5 h-5" /> Mi Perfil
+                </Link>
+                <button 
+                  onClick={() => { signOut(); setIsMenuOpen(false); }}
+                  className="flex items-center gap-2 text-lg font-bold text-red-500"
+                >
+                  <LogOut className="w-5 h-5" /> Cerrar Sesión
+                </button>
+              </>
             ) : (
               <Link 
                  href="/login"

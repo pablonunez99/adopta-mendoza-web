@@ -11,21 +11,27 @@ interface Mascota {
   age_approx: string;
   size: string;
   description: string;
-  status: 'adoptable' | 'adopted' | 'reserved'; // Adjust based on your schema enum
+  status: 'adoptable' | 'adopted' | 'reserved';
   photos: string[];
   medical_notes: string;
   sex: 'male' | 'female' | 'unknown';
+  owner_id?: string; // ID del usuario si es un particular
   shelters: {
     name: string;
     phone: string;
     website?: string;
     address?: string;
   } | null;
+  // Info del dueño si no es refugio
+  owner?: {
+    full_name: string;
+    phone: string;
+    email: string;
+  } | null;
 }
 
 // 1. Función para obtener la MASCOTA por ID
 async function getMascota(id: string): Promise<Mascota | null> {
-  // Nota: La tabla en la DB sigue llamándose 'animals'
   const { data, error } = await supabase
     .from('animals') 
     .select(`
@@ -43,7 +49,24 @@ async function getMascota(id: string): Promise<Mascota | null> {
   if (error || !data) {
     return null;
   }
-  return data as Mascota;
+
+  const mascota = data as Mascota;
+
+  // Si tiene owner_id y no es de un refugio (o prefieres mostrar data del usuario)
+  // buscamos el perfil del usuario.
+  if (mascota.owner_id && !mascota.shelters) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('full_name, phone, email')
+      .eq('id', mascota.owner_id)
+      .single();
+    
+    if (profile) {
+      mascota.owner = profile;
+    }
+  }
+
+  return mascota;
 }
 
 // 2. Componente de Página
@@ -56,9 +79,12 @@ export default async function MascotaPage({ params }: { params: Promise<{ id: st
   }
 
   // Lógica de contacto
-  const telefonoRefugio = mascota.shelters?.phone || '549261000000';
+  // Prioridad: Refugio > Dueño > Default
+  const contactName = mascota.shelters?.name || mascota.owner?.full_name || 'Anunciante';
+  const contactPhone = mascota.shelters?.phone || mascota.owner?.phone || '549261000000';
+  
   const mensajeWhatsapp = `Hola, estoy interesado en adoptar a ${mascota.name} que vi en AdoptaMendoza Web.`;
-  const linkWhatsapp = `https://wa.me/${telefonoRefugio}?text=${encodeURIComponent(mensajeWhatsapp)}`;
+  const linkWhatsapp = `https://wa.me/${contactPhone}?text=${encodeURIComponent(mensajeWhatsapp)}`;
 
   return (
     <main className="min-h-screen bg-background pb-12 transition-colors duration-300">
@@ -159,11 +185,15 @@ export default async function MascotaPage({ params }: { params: Promise<{ id: st
             <div className="flex flex-col md:flex-row items-center justify-between bg-gray-50 dark:bg-gray-900/50 rounded-2xl p-6 gap-6 border border-gray-100 dark:border-gray-800">
               <div className="flex items-center gap-4 w-full md:w-auto">
                 <div className="w-12 h-12 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center shadow-sm text-2xl border border-gray-100 dark:border-gray-700">
-                  🏡
+                  {mascota.shelters ? '🏡' : '👤'}
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">Estás contactando a</p>
-                  <p className="text-lg font-bold text-gray-900 dark:text-gray-100 leading-none mb-1">{mascota.shelters?.name || 'Refugio'}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">
+                    {mascota.shelters ? 'Estás contactando a' : 'Publicado por'}
+                  </p>
+                  <p className="text-lg font-bold text-gray-900 dark:text-gray-100 leading-none mb-1">
+                    {contactName}
+                  </p>
                    {mascota.shelters?.address && (
                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">{mascota.shelters.address}</p>
                    )}
@@ -181,7 +211,7 @@ export default async function MascotaPage({ params }: { params: Promise<{ id: st
                 rel="noopener noreferrer"
                 className="w-full md:w-auto bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-full font-bold text-lg flex items-center justify-center gap-2 transition-all hover:scale-105 shadow-lg shadow-green-200 dark:shadow-none"
               >
-                <span>💬</span> Quiero Adoptarlo
+                <span>💬</span> Contactar
               </a>
             </div>
 
