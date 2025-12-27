@@ -3,6 +3,8 @@ import { supabase } from '@/lib/supabaseClient';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 
+import ShareButtons from '@/components/ShareButtons';
+
 interface Mascota {
   id: string;
   name: string;
@@ -168,6 +170,11 @@ export default async function MascotaPage({ params }: { params: Promise<{ id: st
               <p className="text-gray-600 dark:text-gray-400 leading-relaxed text-lg whitespace-pre-line">
                 {mascota.description}
               </p>
+              
+              <ShareButtons 
+                title={`Conoce a ${mascota.name} en AdoptaMendoza`} 
+                text={`¡Ayudemos a ${mascota.name} a encontrar un hogar! 🐾`} 
+              />
             </div>
 
             {/* Notas Médicas */}

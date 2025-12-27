@@ -94,13 +94,18 @@ export default function ProfilePage() {
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
+    
+    // Sanitización: Solo dejar números
+    const cleanPhone = phone.replace(/\D/g, '');
+    
     try {
       const { error } = await supabase
         .from('profiles')
-        .update({ full_name: fullName, phone: phone })
+        .update({ full_name: fullName, phone: cleanPhone })
         .eq('id', user!.id);
 
       if (error) throw error;
+      setPhone(cleanPhone);
       toast.success('Perfil actualizado correctamente');
     } catch (error: any) {
       toast.error('Error actualizando perfil');
@@ -270,6 +275,13 @@ export default function ProfilePage() {
                            className="text-xs font-bold bg-gray-100 dark:bg-gray-800 hover:bg-blue-100 hover:text-blue-700 px-3 py-2 rounded-lg transition-colors flex items-center gap-1"
                         >
                            Ver Ficha
+                        </Link>
+
+                        <Link 
+                           href={`/mascotas/${animal.id}/editar`}
+                           className="text-xs font-bold bg-gray-100 dark:bg-gray-800 hover:bg-yellow-100 hover:text-yellow-700 px-3 py-2 rounded-lg transition-colors flex items-center gap-1"
+                        >
+                           <Edit className="w-3 h-3" /> Editar
                         </Link>
                         
                         <button 
