@@ -16,7 +16,7 @@ export function Header() {
     { name: 'Adopta', href: '/adopta' },
     { name: 'Refugios', href: '/refugios' },
     { name: 'Encontrá', href: '/encontra' },
-    { name: 'Doná', href: '/#dona' },
+    { name: 'Doná', href: '/donar' },
   ];
 
   return (

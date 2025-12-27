@@ -241,10 +241,10 @@ export default async function LandingPage() {
               <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">
                 Somos una organización sin fines de lucro. Tu donación nos ayuda a cubrir gastos veterinarios, alimento y refugio temporal para cientos de animales.
               </p>
-              <button className="bg-primary hover:bg-red-600 text-white font-bold py-4 px-8 rounded-full shadow-lg transition-all flex items-center gap-2">
+              <Link href="/donar" className="bg-primary hover:bg-red-600 text-white font-bold py-4 px-8 rounded-full shadow-lg transition-all flex items-center gap-2 inline-flex">
                 <HandHeart className="w-5 h-5" />
                 Donar Ahora
-              </button>
+              </Link>
             </div>
             <div className="flex-1 flex justify-center w-full">
                <div className="w-full max-w-sm bg-gray-100 dark:bg-gray-800 rounded-2xl p-8 text-center border-2 border-dashed border-gray-300 dark:border-gray-700">
