@@ -18,7 +18,11 @@ export default function DonatePage() {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    initMercadoPago(MP_PUBLIC_KEY, { locale: 'es-AR' });
+    if (MP_PUBLIC_KEY && MP_PUBLIC_KEY !== 'TEST-000000-000000-000000-000000') {
+      initMercadoPago(MP_PUBLIC_KEY, { locale: 'es-AR' });
+    } else {
+      console.warn('Mercado Pago Public Key no configurada. Los pagos no funcionarán.');
+    }
   }, []);
 
   const handleAmountSelect = (value: number) => {
@@ -152,7 +156,10 @@ export default function DonatePage() {
 
             <div className="min-h-[60px]">
               {loading && (
-                <div className="w-full bg-gray-100 dark:bg-gray-800 h-12 rounded-full animate-pulse"></div>
+                <div className="w-full bg-[#009ee3] h-12 rounded-lg flex items-center justify-center gap-3 animate-pulse shadow-md">
+                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                   <span className="text-white font-bold text-sm">Generando pago...</span>
+                </div>
               )}
               
               {!loading && preferenceId && (
@@ -160,7 +167,7 @@ export default function DonatePage() {
               )}
 
               {!loading && !preferenceId && (
-                <div className="text-center text-gray-400 text-sm">
+                <div className="text-center text-gray-400 text-sm py-4 border-2 border-dashed border-gray-100 dark:border-gray-800 rounded-xl">
                   Selecciona un monto para donar con Mercado Pago
                 </div>
               )}

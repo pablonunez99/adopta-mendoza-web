@@ -1,14 +1,16 @@
 import { MercadoPagoConfig, Preference } from 'mercadopago';
 import { NextResponse } from 'next/server';
 
-// Initialize server-side SDK
-// MAKE SURE TO ADD MP_ACCESS_TOKEN TO YOUR .ENV
-const client = new MercadoPagoConfig({ 
-  accessToken: process.env.MP_ACCESS_TOKEN || 'TEST-0000000000000000-000000-00000000000000000000000000000000-000000000' 
-});
-
 export async function POST(req: Request) {
   try {
+    const accessToken = process.env.MP_ACCESS_TOKEN;
+    
+    if (!accessToken || accessToken.includes('TEST-0000000000')) {
+      return NextResponse.json({ error: 'Mercado Pago Access Token no configurado' }, { status: 500 });
+    }
+
+    const client = new MercadoPagoConfig({ accessToken });
+
     const body = await req.json();
     const { title, quantity, price } = body;
 
