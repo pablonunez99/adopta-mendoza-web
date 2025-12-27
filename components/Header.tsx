@@ -14,6 +14,7 @@ export function Header() {
   const navLinks = [
     { name: 'Inicio', href: '/' },
     { name: 'Adopta', href: '/adopta' },
+    { name: 'Refugios', href: '/refugios' },
     { name: 'Encontrá', href: '/encontra' },
     { name: 'Doná', href: '/#dona' },
   ];
