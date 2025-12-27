@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Nunito } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { Header } from "@/components/Header";
+import Footer from "@/components/Footer";
 import { AuthProvider } from "@/context/AuthContext";
 import { Toaster } from "sonner";
 
@@ -45,6 +46,7 @@ export default function RootLayout({
           >
             <Header />
             {children}
+            <Footer />
             <Toaster richColors position="top-center" />
           </ThemeProvider>
         </AuthProvider>

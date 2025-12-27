@@ -213,14 +213,6 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-white dark:bg-[#0a0a0a] border-t border-gray-100 dark:border-gray-800 py-12">
-        <div className="container mx-auto px-4 text-center">
-           <p className="text-gray-500 dark:text-gray-400">
-             © {new Date().getFullYear()} AdoptaMendoza. Hecho con ❤️ para los animales.
-           </p>
-        </div>
-      </footer>
     </div>
   );
 }
