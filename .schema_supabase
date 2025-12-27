@@ -1,0 +1,67 @@
+-- WARNING: This schema is for context only and is not meant to be run.
+-- Table order and constraints may not be valid for execution.
+
+CREATE TABLE public.animals (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  shelter_id uuid,
+  name text NOT NULL,
+  species USER-DEFINED NOT NULL,
+  breed text,
+  age_approx text,
+  size text,
+  description text,
+  status USER-DEFINED DEFAULT 'adoptable'::animal_status,
+  photos ARRAY,
+  medical_notes text,
+  created_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now()),
+  sex text DEFAULT 'unknown'::text CHECK (sex = ANY (ARRAY['male'::text, 'female'::text, 'unknown'::text])),
+  last_seen_lat double precision,
+  last_seen_long double precision,
+  CONSTRAINT animals_pkey PRIMARY KEY (id),
+  CONSTRAINT animals_shelter_id_fkey FOREIGN KEY (shelter_id) REFERENCES public.shelters(id)
+);
+CREATE TABLE public.favorites (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  animal_id uuid NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now()),
+  CONSTRAINT favorites_pkey PRIMARY KEY (id),
+  CONSTRAINT favorites_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
+  CONSTRAINT favorites_animal_id_fkey FOREIGN KEY (animal_id) REFERENCES public.animals(id)
+);
+CREATE TABLE public.profiles (
+  id uuid NOT NULL,
+  email text,
+  full_name text,
+  role USER-DEFINED DEFAULT 'citizen'::user_role,
+  created_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now()),
+  CONSTRAINT profiles_pkey PRIMARY KEY (id),
+  CONSTRAINT profiles_id_fkey FOREIGN KEY (id) REFERENCES auth.users(id)
+);
+CREATE TABLE public.shelters (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  name text NOT NULL,
+  description text,
+  phone text,
+  website text,
+  location USER-DEFINED,
+  manager_id uuid,
+  is_verified boolean DEFAULT false,
+  created_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now()),
+  address text,
+  CONSTRAINT shelters_pkey PRIMARY KEY (id),
+  CONSTRAINT shelters_manager_id_fkey FOREIGN KEY (manager_id) REFERENCES public.profiles(id)
+);
+CREATE TABLE public.sightings (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid,
+  species_guess text,
+  description text,
+  media_urls ARRAY,
+  location USER-DEFINED,
+  is_anonymous boolean DEFAULT false,
+  status text DEFAULT 'pending_review'::text,
+  created_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now()),
+  CONSTRAINT sightings_pkey PRIMARY KEY (id),
+  CONSTRAINT sightings_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.profiles(id)
+);
