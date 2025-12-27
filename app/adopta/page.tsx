@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabaseClient';
 import Link from 'next/link';
+import { Plus } from 'lucide-react';
 
 // Definimos el tipo (Similar a tu modelo en Dart)
 type Animal = {
@@ -120,6 +121,17 @@ export default async function AdoptaPage() {
             </Link>
           ))}
         </div>
+      </div>
+
+      {/* Floating Action Button for Adding Pet */}
+      <div className="fixed bottom-8 right-8 z-20">
+        <Link 
+          href="/adopta/nueva"
+          className="bg-primary hover:bg-red-600 text-white font-bold py-4 px-6 rounded-full shadow-2xl flex items-center gap-2 hover:scale-105 transition-transform"
+        >
+          <Plus className="w-6 h-6" />
+          Publicar Mascota
+        </Link>
       </div>
     </main>
   );

@@ -17,7 +17,8 @@ export default function AddPetPage() {
   const [name, setName] = useState('');
   const [species, setSpecies] = useState('dog');
   const [breed, setBreed] = useState('');
-  const [ageApprox, setAgeApprox] = useState('');
+  const [ageYears, setAgeYears] = useState('');
+  const [ageMonths, setAgeMonths] = useState('');
   const [size, setSize] = useState('medium');
   const [sex, setSex] = useState('unknown');
   const [description, setDescription] = useState('');
@@ -41,6 +42,18 @@ export default function AddPetPage() {
 
     setSubmitting(true);
 
+    // Construct age string
+    let ageString = '';
+    const years = parseInt(ageYears) || 0;
+    const months = parseInt(ageMonths) || 0;
+
+    if (years > 0) ageString += `${years} año${years > 1 ? 's' : ''}`;
+    if (months > 0) {
+      if (ageString) ageString += ', ';
+      ageString += `${months} mes${months > 1 ? 'es' : ''}`;
+    }
+    if (!ageString) ageString = 'Desconocida';
+
     try {
       const { error } = await supabase.from('animals').insert([
         {
@@ -48,7 +61,7 @@ export default function AddPetPage() {
           species,
           breed,
           sex,
-          age_approx: ageApprox,
+          age_approx: ageString,
           size,
           description,
           medical_notes: medicalNotes,
@@ -125,13 +138,31 @@ export default function AddPetPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Edad Aprox.</label>
-              <input
-                type="text"
-                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary outline-none transition-all dark:text-white"
-                placeholder="Ej. 2 años, 5 meses"
-                value={ageApprox}
-                onChange={(e) => setAgeApprox(e.target.value)}
-              />
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <input
+                    type="number"
+                    min="0"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary outline-none transition-all dark:text-white"
+                    placeholder="Años"
+                    value={ageYears}
+                    onChange={(e) => setAgeYears(e.target.value)}
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs pointer-events-none">Años</span>
+                </div>
+                <div className="relative flex-1">
+                  <input
+                    type="number"
+                    min="0"
+                    max="11"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary outline-none transition-all dark:text-white"
+                    placeholder="Meses"
+                    value={ageMonths}
+                    onChange={(e) => setAgeMonths(e.target.value)}
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs pointer-events-none">Meses</span>
+                </div>
+              </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Sexo</label>

@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabaseClient';
 import LostPetsMap from '@/components/LostPetsMap';
 import { Search, AlertTriangle } from 'lucide-react';
+import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
 
@@ -60,10 +61,13 @@ export default async function EncontraPage() {
 
       {/* Report Button / Floating Action */}
       <div className="fixed bottom-8 right-8 z-20">
-        <button className="bg-primary hover:bg-red-600 text-white font-bold py-4 px-6 rounded-full shadow-2xl flex items-center gap-2 hover:scale-105 transition-transform">
+        <Link 
+          href="/encontra/reportar"
+          className="bg-primary hover:bg-red-600 text-white font-bold py-4 px-6 rounded-full shadow-2xl flex items-center gap-2 hover:scale-105 transition-transform"
+        >
           <AlertTriangle className="w-5 h-5" />
           Reportar Mascota
-        </button>
+        </Link>
       </div>
 
     </div>

@@ -5,13 +5,17 @@ import { supabase } from '@/lib/supabaseClient';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import Link from 'next/link';
-import { Mail, Lock, User as UserIcon, Loader2 } from 'lucide-react';
+import { Mail, Lock, User as UserIcon, Loader2, Home, HeartHandshake } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+
+type UserRole = 'adopter' | 'shelter' | 'transit';
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
+  const [role, setRole] = useState<UserRole>('adopter');
+  const [orgName, setOrgName] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { user, isLoading } = useAuth();
@@ -34,6 +38,7 @@ export default function RegisterPage() {
         options: {
           data: {
             full_name: fullName,
+            role_type: role, // Storing intention in metadata
           },
         },
       });
@@ -41,7 +46,7 @@ export default function RegisterPage() {
       if (signUpError) throw signUpError;
 
       if (data.user) {
-        // 2. Create profile (Upsert to handle potential race condition with triggers)
+        // 2. Create profile
         const { error: profileError } = await supabase
           .from('profiles')
           .upsert([
@@ -49,12 +54,33 @@ export default function RegisterPage() {
               id: data.user.id,
               email: email,
               full_name: fullName,
+              // We keep 'role' as default ('citizen') for now to avoid enum errors,
+              // relying on the shelters table to identify managers.
             },
           ]);
 
         if (profileError) {
            console.error('Error creating profile:', JSON.stringify(profileError, null, 2));
-           // We don't block the flow here because the user is created in Auth
+        }
+
+        // 3. If Shelter or Transit, create shelter record
+        if (role === 'shelter' || role === 'transit') {
+          const typeLabel = role === 'shelter' ? 'Refugio' : 'Hogar de Tránsito';
+          const { error: shelterError } = await supabase
+            .from('shelters')
+            .insert([
+              {
+                manager_id: data.user.id,
+                name: orgName,
+                description: `${typeLabel} registrado en la plataforma.`,
+                is_verified: false, // Default to false until approved
+              }
+            ]);
+          
+          if (shelterError) {
+             console.error('Error creating shelter:', JSON.stringify(shelterError, null, 2));
+             toast.error('Hubo un problema registrando tu organización, pero tu usuario fue creado.');
+          }
         }
 
         toast.success('¡Registro exitoso! Por favor verifica tu email.');
@@ -68,7 +94,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-[#0a0a0a] px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-[#0a0a0a] px-4 py-12">
       <div className="w-full max-w-md bg-white dark:bg-[#151515] p-8 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-black text-gray-900 dark:text-white">Crear Cuenta</h1>
@@ -76,6 +102,35 @@ export default function RegisterPage() {
         </div>
 
         <form onSubmit={handleRegister} className="space-y-6">
+          
+          {/* Role Selection */}
+          <div className="grid grid-cols-3 gap-2 mb-6">
+            <button
+              type="button"
+              onClick={() => setRole('adopter')}
+              className={`flex flex-col items-center justify-center p-3 rounded-xl border transition-all ${role === 'adopter' ? 'border-primary bg-primary/5 text-primary' : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-500'}`}
+            >
+              <HeartHandshake className="w-6 h-6 mb-1" />
+              <span className="text-xs font-bold">Adoptar</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setRole('shelter')}
+              className={`flex flex-col items-center justify-center p-3 rounded-xl border transition-all ${role === 'shelter' ? 'border-primary bg-primary/5 text-primary' : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-500'}`}
+            >
+              <Home className="w-6 h-6 mb-1" />
+              <span className="text-xs font-bold">Refugio</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setRole('transit')}
+              className={`flex flex-col items-center justify-center p-3 rounded-xl border transition-all ${role === 'transit' ? 'border-primary bg-primary/5 text-primary' : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-500'}`}
+            >
+              <Home className="w-6 h-6 mb-1" />
+              <span className="text-xs font-bold text-center leading-tight">Hogar Tránsito</span>
+            </button>
+          </div>
+
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Nombre Completo</label>
             <div className="relative">
@@ -90,6 +145,25 @@ export default function RegisterPage() {
               />
             </div>
           </div>
+
+          {(role === 'shelter' || role === 'transit') && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                {role === 'shelter' ? 'Nombre del Refugio' : 'Nombre del Hogar / Organización'}
+              </label>
+              <div className="relative">
+                <Home className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  type="text"
+                  required
+                  className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all dark:text-white"
+                  placeholder={role === 'shelter' ? "Refugio Patitas" : "Hogar de Tránsito Mendoza"}
+                  value={orgName}
+                  onChange={(e) => setOrgName(e.target.value)}
+                />
+              </div>
+            </div>
+          )}
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email</label>
