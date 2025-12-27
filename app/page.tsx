@@ -1,6 +1,6 @@
 import { supabase } from '@/lib/supabaseClient';
 import Link from 'next/link';
-import { Heart, Search, HandHeart, Mail, ArrowRight, PawPrint } from 'lucide-react';
+import { Heart, Search, HandHeart, Mail, ArrowRight, PawPrint, PartyPopper } from 'lucide-react';
 
 // Reusing types for the preview section
 type Animal = {
@@ -44,8 +44,32 @@ async function getFeaturedAnimals(): Promise<Animal[]> {
   return (data || []) as unknown as Animal[];
 }
 
+async function getRecentSuccessStories(): Promise<Animal[]> {
+  const { data, error } = await supabase
+    .from('animals')
+    .select(`
+      id, 
+      name, 
+      breed, 
+      photos, 
+      status,
+      shelters ( name ) 
+    `)
+    .eq('status', 'adopted')
+    .order('created_at', { ascending: false })
+    .limit(3);
+
+  if (error) {
+    console.error('Error cargando historias:', error);
+    return [];
+  }
+
+  return (data || []) as unknown as Animal[];
+}
+
 export default async function LandingPage() {
   const featuredAnimals = await getFeaturedAnimals();
+  const successStories = await getRecentSuccessStories();
 
   return (
     <div className="flex flex-col bg-background text-foreground transition-colors duration-300">
@@ -166,6 +190,51 @@ export default async function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* Success Stories Preview */}
+      {successStories.length > 0 && (
+        <section className="py-20 bg-white dark:bg-[#0a0a0a]">
+          <div className="container mx-auto px-4">
+            <div className="flex flex-col items-center mb-12 text-center">
+              <span className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 font-bold px-4 py-1 rounded-full text-sm mb-4 inline-flex items-center gap-2">
+                <PartyPopper className="w-4 h-4" /> Finales Felices
+              </span>
+              <h2 className="text-3xl md:text-5xl font-black text-gray-900 dark:text-white mb-4">
+                Ellos ya encontraron su hogar
+              </h2>
+              <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl">
+                Descubre las historias de las mascotas que cambiaron su vida gracias a la adopción.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {successStories.map((story) => (
+                <div key={story.id} className="relative group overflow-hidden rounded-3xl h-80 shadow-lg">
+                   {story.photos && story.photos.length > 0 ? (
+                     <img 
+                       src={story.photos[0]} 
+                       alt={story.name} 
+                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                     />
+                   ) : (
+                     <div className="w-full h-full bg-gray-200 flex items-center justify-center">Sin Foto</div>
+                   )}
+                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-6">
+                     <h3 className="text-2xl font-bold text-white mb-1">{story.name}</h3>
+                     <p className="text-gray-300 font-medium">Adoptado</p>
+                   </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-12 text-center">
+              <Link href="/historias" className="inline-flex items-center gap-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-white font-bold py-3 px-8 rounded-full transition-colors">
+                Ver todas las historias <ArrowRight className="w-5 h-5" />
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Doná Section */}
       <section id="dona" className="min-h-screen flex items-center py-20 bg-primary/5 dark:bg-primary/10">

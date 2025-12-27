@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Filter, X } from 'lucide-react';
+import { Filter, X, Check } from 'lucide-react';
 
 export default function AdoptionFilters() {
   const router = useRouter();
@@ -14,7 +14,6 @@ export default function AdoptionFilters() {
   const [species, setSpecies] = useState(searchParams.get('species') || '');
   const [size, setSize] = useState(searchParams.get('size') || '');
   const [sex, setSex] = useState(searchParams.get('sex') || '');
-  const [age, setAge] = useState(searchParams.get('age') || '');
 
   // Debounced update for filters
   useEffect(() => {
@@ -22,87 +21,150 @@ export default function AdoptionFilters() {
     if (species) params.set('species', species);
     if (size) params.set('size', size);
     if (sex) params.set('sex', sex);
-    if (age) params.set('age', age);
     
-    // Push updates to URL without full reload (shallow routing logic handled by Next.js app router implicitly)
-    // We replace so we don't build huge history stack
     router.replace(`/adopta?${params.toString()}`, { scroll: false });
-  }, [species, size, sex, age, router]);
+  }, [species, size, sex, router]);
 
   const clearFilters = () => {
     setSpecies('');
     setSize('');
     setSex('');
-    setAge('');
     router.replace('/adopta', { scroll: false });
   };
 
-  const hasFilters = species || size || sex || age;
+  const hasFilters = species || size || sex;
 
   return (
     <div className="mb-8">
-      {/* Mobile Toggle */}
+      {/* Mobile Toggle Button */}
       <div className="md:hidden mb-4">
         <button 
           onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center gap-2 bg-white dark:bg-[#151515] border border-gray-200 dark:border-gray-800 px-4 py-2 rounded-lg font-bold text-sm shadow-sm"
+          className={`flex items-center gap-2 px-4 py-2 rounded-full font-bold text-sm shadow-sm transition-all ${
+            isOpen ? 'bg-primary text-white' : 'bg-white dark:bg-[#151515] border border-gray-200 dark:border-gray-800'
+          }`}
         >
           <Filter className="w-4 h-4" />
           {isOpen ? 'Ocultar Filtros' : 'Filtrar Mascotas'}
         </button>
       </div>
 
-      {/* Filter Bar */}
-      <div className={`${isOpen ? 'block' : 'hidden'} md:block bg-white dark:bg-[#151515] p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 transition-all`}>
-        <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-          <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
-            
-            {/* Especie */}
-            <select 
-              value={species} 
-              onChange={(e) => setSpecies(e.target.value)}
-              className="bg-gray-50 dark:bg-gray-800 border-none rounded-lg px-4 py-2 text-sm font-medium focus:ring-2 focus:ring-primary outline-none"
-            >
-              <option value="">Todas las Especies</option>
-              <option value="dog">Perros</option>
-              <option value="cat">Gatos</option>
-              <option value="other">Otros</option>
-            </select>
+      {/* Filter Area */}
+      <div className={`${isOpen ? 'block' : 'hidden'} md:block transition-all duration-300`}>
+        <div className="bg-white dark:bg-[#151515] p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800">
+          
+          <div className="flex flex-col md:flex-row gap-8 items-start md:items-center justify-between">
+            <div className="flex flex-col md:flex-row gap-8 w-full">
+              
+              {/* Filter Group: Species */}
+              <FilterGroup label="Especie">
+                <FilterPill 
+                  label="Todos" 
+                  isActive={species === ''} 
+                  onClick={() => setSpecies('')} 
+                />
+                <FilterPill 
+                  label="Perros" 
+                  isActive={species === 'dog'} 
+                  onClick={() => setSpecies('dog')} 
+                />
+                <FilterPill 
+                  label="Gatos" 
+                  isActive={species === 'cat'} 
+                  onClick={() => setSpecies('cat')} 
+                />
+              </FilterGroup>
 
-            {/* Sexo */}
-            <select 
-              value={sex} 
-              onChange={(e) => setSex(e.target.value)}
-              className="bg-gray-50 dark:bg-gray-800 border-none rounded-lg px-4 py-2 text-sm font-medium focus:ring-2 focus:ring-primary outline-none"
-            >
-              <option value="">Cualquier Sexo</option>
-              <option value="male">Macho</option>
-              <option value="female">Hembra</option>
-            </select>
+              <div className="w-px bg-gray-200 dark:bg-gray-800 hidden md:block h-8 self-center"></div>
 
-            {/* Tamaño */}
-            <select 
-              value={size} 
-              onChange={(e) => setSize(e.target.value)}
-              className="bg-gray-50 dark:bg-gray-800 border-none rounded-lg px-4 py-2 text-sm font-medium focus:ring-2 focus:ring-primary outline-none"
-            >
-              <option value="">Cualquier Tamaño</option>
-              <option value="small">Pequeño</option>
-              <option value="medium">Mediano</option>
-              <option value="large">Grande</option>
-            </select>
+              {/* Filter Group: Sex */}
+              <FilterGroup label="Sexo">
+                <FilterPill 
+                  label="Todos" 
+                  isActive={sex === ''} 
+                  onClick={() => setSex('')} 
+                />
+                <FilterPill 
+                  label="Machos" 
+                  isActive={sex === 'male'} 
+                  onClick={() => setSex('male')} 
+                />
+                <FilterPill 
+                  label="Hembras" 
+                  isActive={sex === 'female'} 
+                  onClick={() => setSex('female')} 
+                />
+              </FilterGroup>
+
+              <div className="w-px bg-gray-200 dark:bg-gray-800 hidden md:block h-8 self-center"></div>
+
+              {/* Filter Group: Size */}
+              <FilterGroup label="Tamaño">
+                <FilterPill 
+                  label="Todos" 
+                  isActive={size === ''} 
+                  onClick={() => setSize('')} 
+                />
+                <FilterPill 
+                  label="Pequeño" 
+                  isActive={size === 'small'} 
+                  onClick={() => setSize('small')} 
+                />
+                <FilterPill 
+                  label="Mediano" 
+                  isActive={size === 'medium'} 
+                  onClick={() => setSize('medium')} 
+                />
+                <FilterPill 
+                  label="Grande" 
+                  isActive={size === 'large'} 
+                  onClick={() => setSize('large')} 
+                />
+              </FilterGroup>
+
+            </div>
+
+            {/* Clear Button */}
+            {hasFilters && (
+              <button 
+                onClick={clearFilters}
+                className="mt-4 md:mt-0 text-red-500 text-sm font-bold flex items-center gap-1 hover:bg-red-50 dark:hover:bg-red-900/10 px-3 py-1 rounded-full transition-colors self-end md:self-center flex-shrink-0"
+              >
+                <X className="w-4 h-4" /> Limpiar
+              </button>
+            )}
           </div>
-
-          {hasFilters && (
-            <button 
-              onClick={clearFilters}
-              className="text-red-500 text-sm font-bold flex items-center gap-1 hover:underline"
-            >
-              <X className="w-4 h-4" /> Limpiar Filtros
-            </button>
-          )}
         </div>
       </div>
     </div>
+  );
+}
+
+// Sub-components for better organization
+
+function FilterGroup({ label, children }: { label: string, children: React.ReactNode }) {
+  return (
+    <div className="flex flex-col gap-2">
+      <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">{label}</span>
+      <div className="flex flex-wrap gap-2">
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function FilterPill({ label, isActive, onClick }: { label: string, isActive: boolean, onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`px-4 py-2 rounded-full text-sm font-bold transition-all border ${
+        isActive 
+          ? 'bg-primary text-white border-primary shadow-md transform scale-105' 
+          : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border-transparent hover:bg-gray-100 dark:hover:bg-gray-700'
+      }`}
+    >
+      {isActive && <Check className="w-3 h-3 inline-block mr-1 mb-0.5" />}
+      {label}
+    </button>
   );
 }
